@@ -80,3 +80,63 @@ generate_next_state(Move, PrevBoardState, NextBoardState) :-
   alter_board(Move, PrevBoardState, NewBoardState),
   write(NewBoardState),
   next_generation(NewBoardState, NextBoardState), write(NextBoardState).
+
+self_preservation('b', [Blue, Red], NewBoardState, Move) :-
+  length(Red, NumRed),
+  findall([A,B,MA,MB], (member([A,B], Blue), 
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_highest_self('b', PossMoves, [Blue, Red], [], NumBlue, Move, _), 
+  generate_next_state(Move, [Blue,Red], NewBoardState).
+
+self_preservation('r', [Blue, Red], NewBoardState, Move) :-
+  length(Blue, NumBlue),
+  findall([A,B,MA,MB], (member([A,B], Red),
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_lowest_enemy('r', PossMoves, [Blue, Red], [], NumRed, Move, _),
+  generate_next_state(Move, [Blue,Red], NewBoardState).
+
+land_grab('b', [Blue, Red], NewBoardState, Move) :-
+  length(Red, NumRed),
+  findall([A,B,MA,MB], (member([A,B], Blue), 
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_greatest_difference('b', PossMoves, [Blue, Red], [], NumBlue, NumRed, Move, _), 
+  generate_next_state(Move, [Blue,Red], NewBoardState).
+
+land_grab('r', [Blue, Red], NewBoardState, Move) :-
+  length(Blue, NumBlue),
+  findall([A,B,MA,MB], (member([A,B], Red),
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_greatest_difference('r', PossMoves, [Blue, Red], [], NumBlue, NumRed, Move, _),
+  generate_next_state(Move, [Blue,Red], NewBoardState).
+
+minimax('b', [Blue, Red], NewBoardState, Move) :-
+  length(Red, NumRed),
+  findall([A,B,MA,MB], (member([A,B], Blue), 
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_best_outcome('b', PossMoves, [Blue, Red], [], NumBlue, NumRed, Move, _), 
+  generate_next_state(Move, [Blue,Red], NewBoardState).
+
+minimax('r', [Blue, Red], NewBoardState, Move) :-
+  length(Blue, NumBlue),
+  findall([A,B,MA,MB], (member([A,B], Red),
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_best_outcome('r', PossMoves, [Blue, Red], [], NumBlue, NumRed, Move, _),
+  generate_next_state(Move, [Blue,Red], NewBoardState).
