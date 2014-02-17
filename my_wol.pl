@@ -43,3 +43,40 @@ test_strategy_recursive(NumToPlay, StratOne, StratTwo, NumDraw, BlueWin, RedWin,
   write('; Shortest: '), write(Shortest),
   Average is Total / NumToPlay,
   write('; Average: '), write(Average).
+
+bloodlust('b', [Blue, Red], NewBoardState, Move) :-
+  length(Red, NumRed),
+  findall([A,B,MA,MB], (member([A,B], Blue), 
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_lowest_enemy('b', PossMoves, [Blue, Red], [], NumRed, Move, _), 
+  generate_next_state(Move, [Blue,Red], NewBoardState).
+
+bloodlust('r', [Blue, Red], NewBoardState, Move) :-
+  length(Blue, NumBlue),
+  findall([A,B,MA,MB], (member([A,B], Red),
+                        neighbour_position(A,B,[MA,MB]),
+                        \+member([MA,MB], Blue),
+                        \+member([MA,MB], Red)),
+            PossMoves),
+  find_lowest_enemy('r', PossMoves, [Blue, Red], [], NumBlue, Move, _),
+  generate_next_state(Move, [Blue,Red], NewBoardState).
+  
+find_lowest_enemy(Colour, [Move | PossMoves], CurrentBoardState, BestMove, NumEnemy, UltimateMove, FinalEnemy) :-
+  generate_next_state(Move, CurrentBoardState, [NewBlue, NewRed]), 
+  write(NewRed), write(','), write(NewBlue),
+  ((Colour = 'b') -> List = NewRed; List = NewBlue),
+  length(List, NewEnemy),
+  ((NewEnemy < NumEnemy) -> (NewBestMove = Move, NewNumEnemy is NewEnemy); (NewBestMove = BestMove, NewNumEnemy is NumEnemy)),
+  find_lowest_enemy(Colour, PossMoves, CurrentBoardState, NewBestMove, NewNumEnemy, UltimateMove, FinalEnemy).
+
+
+find_lowest_enemy(_, [], _, Move, NumEnemy, Move, NumEnemy).
+
+generate_next_state(Move, PrevBoardState, NextBoardState) :-
+  write(PrevBoardState), write(' '),
+  alter_board(Move, PrevBoardState, NewBoardState),
+  write(NewBoardState),
+  next_generation(NewBoardState, NextBoardState), write(NextBoardState).
