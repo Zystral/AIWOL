@@ -134,7 +134,7 @@ find_greatest_difference(Colour, [Move | PossMoves], CurrentBoardState, BestMove
   generate_next_state(Colour, Move, CurrentBoardState, [NewBlue, NewRed]),
   length(NewBlue, TempNumBlue),
   length(NewRed, TempNumRed),
-  ((Colour = 'b') -> Diff is NewBlue - NewRed; Diff is NewRed - NewBlue),
+  ((Colour = 'b') -> Diff is TempNumBlue - TempNumRed; Diff is TempNumRed - TempNumBlue),
   ((Diff > MoveDiff) -> (NewMoveDiff is Diff, NewBestMove = Move); (NewMoveDiff is MoveDiff, NewBestMove = BestMove)),
   find_greatest_difference(Colour, PossMoves, CurrentBoardState, NewBestMove, NewMoveDiff, UltimateMove, FinalDiff).
 
