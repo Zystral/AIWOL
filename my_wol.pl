@@ -108,27 +108,40 @@ find_highest_self(Colour, [Move | PossMoves], CurrentBoardState, BestMove, NumSe
 find_highest_self(_, [], _, Move, NumSelf, Move, NumSelf).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%  Land Grab  %%%%%%%%%%%
+%%%%  Land Grab  %%%%%%%%%%%%%%%%%%%
 
-land_grab('b', [Blue, Red], NewBoardState, Move) :-
+land_grab('b', [Blue, Red], [NewBlue, Red], Move) :-
   length(Red, NumRed),
   findall([A,B,MA,MB], (member([A,B], Blue), 
                         neighbour_position(A,B,[MA,MB]),
                         \+member([MA,MB], Blue),
                         \+member([MA,MB], Red)),
             PossMoves),
-  find_greatest_difference('b', PossMoves, [Blue, Red], [], NumBlue, NumRed, Move, _), 
-  generate_next_state(Move, [Blue,Red], NewBoardState).
+  find_greatest_difference('b', PossMoves, [Blue, Red], [], 0, Move, _), 
+  alter_board(Move, Blue, NewBlue).
 
-land_grab('r', [Blue, Red], NewBoardState, Move) :-
+land_grab('r', [Blue, Red], [Blue, NewRed], Move) :-
   length(Blue, NumBlue),
   findall([A,B,MA,MB], (member([A,B], Red),
                         neighbour_position(A,B,[MA,MB]),
                         \+member([MA,MB], Blue),
                         \+member([MA,MB], Red)),
             PossMoves),
-  find_greatest_difference('r', PossMoves, [Blue, Red], [], NumBlue, NumRed, Move, _),
-  generate_next_state(Move, [Blue,Red], NewBoardState).
+  find_greatest_difference('r', PossMoves, [Blue, Red], [], 0, Move, _),
+  alter_board(Move, Red, NewRed).
+
+find_greatest_difference(Colour, [Move | PossMoves], CurrentBoardState, BestMove, MoveDiff, UltimateMove, FinalDiff) :-
+  generate_next_state(Colour, Move, CurrentBoardState, [NewBlue, NewRed]),
+  length(NewBlue, TempNumBlue),
+  length(NewRed, TempNumRed),
+  ((Colour = 'b') -> Diff is NewBlue - NewRed; Diff is NewRed - NewBlue),
+  ((Diff > MoveDiff) -> (NewMoveDiff is Diff, NewBestMove = Move); (NewMoveDiff is MoveDiff, NewBestMove = BestMove)),
+  find_greatest_difference(Colour, PossMoves, CurrentBoardState, NewBestMove, NewMoveDiff, UltimateMove, FinalDiff).
+
+find_greatest_difference(_, [], _, Move, NumDiff, Move, NumDiff).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%  Minimax  %%%%%%%%%%%%%%%%%%%
 
 minimax('b', [Blue, Red], NewBoardState, Move) :-
   length(Red, NumRed),
