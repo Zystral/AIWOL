@@ -116,8 +116,8 @@ land_grab('b', [Blue, Red], [NewBlue, Red], Move) :-
                         neighbour_position(A,B,[MA,MB]),
                         \+member([MA,MB], Blue),
                         \+member([MA,MB], Red)),
-            PossMoves),
-  find_greatest_difference('b', PossMoves, [Blue, Red], [], 0, Move, _), 
+            [First | PossMoves]),
+  find_greatest_difference('b', [First | PossMoves], [Blue, Red], First, 0, Move, _), 
   alter_board(Move, Blue, NewBlue).
 
 land_grab('r', [Blue, Red], [Blue, NewRed], Move) :-
@@ -126,8 +126,8 @@ land_grab('r', [Blue, Red], [Blue, NewRed], Move) :-
                         neighbour_position(A,B,[MA,MB]),
                         \+member([MA,MB], Blue),
                         \+member([MA,MB], Red)),
-            PossMoves),
-  find_greatest_difference('r', PossMoves, [Blue, Red], [], 0, Move, _),
+            [First | PossMoves]),
+  find_greatest_difference('r', [First | PossMoves], [Blue, Red], First, 0, Move, _),
   alter_board(Move, Red, NewRed).
 
 find_greatest_difference(Colour, [Move | PossMoves], CurrentBoardState, BestMove, MoveDiff, UltimateMove, FinalDiff) :-
