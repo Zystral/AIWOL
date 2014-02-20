@@ -147,7 +147,7 @@ minimax('b', [Blue, Red], [NewBlue, Red], Move) :-
                         \+member([MA,MB], Blue),
                         \+member([MA,MB], Red)),
             [First | PossMoves]),
-  look_down_two_ply('b', [First | PossMoves], [Blue, Red], First, -64, Move, _), 
+  look_down_two_ply('b', [First | PossMoves], [Blue, Red], First, -64, Move, _),
   alter_board(Move, Blue, NewBlue).
 
 minimax('r', [Blue, Red], [Blue, NewRed], Move) :-
@@ -159,28 +159,28 @@ minimax('r', [Blue, Red], [Blue, NewRed], Move) :-
   look_down_two_ply('r', [First | PossMoves], [Blue, Red], First, -64, Move, _), 
   alter_board(Move, Red, NewRed).
 
-look_down_two_ply('b', [Move | PossMoves], CurrentBoardState, BestMove, MoveAdv, UltimateMove, FinalAdv) :-
-  generate_next_state('b', Move, CurrentBoardState, TempBoardState),
-  land_grab('r', TempBoardState, NextBoardState, _),
+look_down_two_ply('b', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, UltimateMove, FinalAdv) :-
+  generate_next_state('b', Move, [Blue, Red], [TempBlue, TempRed]),
+  ((\+length(TempRed, 0)) -> (land_grab('r', [TempBlue, TempRed], NextBoardState, _),
   next_generation(NextBoardState, CrankedNextBoardState),
   land_grab('b', CrankedNextBoardState, FinalBoardState, _),
-  next_generation(FinalBoardState, [FinalBlue, FinalRed]),
+  next_generation(FinalBoardState, [FinalBlue, FinalRed])); (FinalBlue = Blue, FinalRed = Red)),
   length(FinalBlue, NumBlue),
   length(FinalRed, NumRed),
   Adv is NumBlue - NumRed,
   ((Adv > MoveAdv) -> (NewMoveAdv is Adv, NewBestMove = Move); (NewMoveAdv is MoveAdv, NewBestMove = BestMove)),
-  look_down_two_ply('b', PossMoves, CurrentBoardState, NewBestMove, NewMoveAdv, UltimateMove, FinalAdv).
+  look_down_two_ply('b', PossMoves, [Blue, Red], NewBestMove, NewMoveAdv, UltimateMove, FinalAdv).
 
-look_down_two_ply('r', [Move | PossMoves], CurrentBoardState, BestMove, MoveAdv, UltimateMove, FinalAdv) :-
-  generate_next_state('r', Move, CurrentBoardState, TempBoardState),
-  land_grab('b', TempBoardState, NextBoardState, _),
+look_down_two_ply('r', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, UltimateMove, FinalAdv) :-
+  generate_next_state('r', Move, [Blue, Red], [TempBlue, TempRed]),
+  ((\+length(TempBlue, 0)) -> (land_grab('b', [TempBlue, TempRed], NextBoardState, _),
   next_generation(NextBoardState, CrankedNextBoardState),
   land_grab('r', CrankedNextBoardState, FinalBoardState, _),
-  next_generation(FinalBoardState, [FinalBlue, FinalRed]),
+  next_generation(FinalBoardState, [FinalBlue, FinalRed])); (FinalBlue = Blue, FinalRed = Red)),
   length(FinalBlue, NumBlue),
   length(FinalRed, NumRed),
   Adv is NumRed - NumBlue,
   ((Adv > MoveAdv) -> (NewMoveAdv is Adv, NewBestMove = Move); (NewMoveAdv is MoveAdv, NewBestMove = BestMove)),
-  look_down_two_ply('r', PossMoves, CurrentBoardState, NewBestMove, NewMoveAdv, UltimateMove, FinalAdv).
+  look_down_two_ply('r', PossMoves, [Blue, Red], NewBestMove, NewMoveAdv, UltimateMove, FinalAdv).
 
 look_down_two_ply(_,[],_,Move,Adv,Move,Adv).
