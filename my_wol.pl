@@ -4,26 +4,31 @@
 %%%%  Test Strategy  %%%%%%%%%%%
 
 test_strategy(NumToPlay, StrategyOne, StrategyTwo) :-
-  test_strategy_recursive(0, StrategyOne, StrategyTwo, 0, 0, 0, 0, 250, 0, NumToPlay).
+  test_strategy_recursive(0, StrategyOne, StrategyTwo, 0, 0, 0, 0, 250, 0, 0, NumToPlay).
 
-test_strategy_recursive(N, StratOne, StratTwo, NumDraw, BlueWin, RedWin, Longest, Shortest, Total, NumToPlay) :-
+test_strategy_recursive(N, StratOne, StratTwo, NumDraw, BlueWin, RedWin, Longest, Shortest, Total, TotalTime, NumToPlay) :-
   NumToPlay \= N,
+  statistics(runtime, [T0 | _]),
   play(quiet, StratOne, StratTwo, NumMoves, WinningPlayer),
+  statistics(runtime, [T1 | _]),
+  T is T1 - T0, NewTotalTime is TotalTime+T,
   player_win(WinningPlayer, NumDraw, BlueWin, RedWin, NewDraw, NewBlue, NewRed),
   NewN is N + 1,
   NewTotal is Total + NumMoves,
   ((NumMoves < Shortest) -> NewShortest is NumMoves; NewShortest is Shortest),
   ((NumMoves > Longest) -> NewLongest is NumMoves; NewLongest is Longest),
-  test_strategy_recursive(NewN, StratOne, StratTwo, NewDraw, NewBlue, NewRed, NewLongest, NewShortest, NewTotal, NumToPlay).
+  test_strategy_recursive(NewN, StratOne, StratTwo, NewDraw, NewBlue, NewRed, NewLongest, NewShortest, NewTotal, NewTotalTime, NumToPlay).
 
-test_strategy_recursive(NumToPlay, _, _, NumDraw, BlueWin, RedWin, Longest, Shortest, Total, NumToPlay) :-
+test_strategy_recursive(NumToPlay, _, _, NumDraw, BlueWin, RedWin, Longest, Shortest, Total, TotalTime, NumToPlay) :-
   write('BlueWin: '), write(BlueWin),
   write('; RedWin: '), write(RedWin),
   write('; Draws: '), write(NumDraw),
   write('; Longest: '), write(Longest),
   write('; Shortest: '), write(Shortest),
   Average is Total / NumToPlay,
-  write('; Average: '), write(Average).
+  Time is TotalTime / NumToPlay,
+  write('; Average moves: '), write(Average),
+  write('; Average time per game: '), write(Time), write(' ms per game.').
 
 player_win('b', NumDraw, BlueWin, RedWin, NumDraw, NewBlue, RedWin) :-
   NewBlue is BlueWin + 1.
