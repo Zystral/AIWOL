@@ -166,10 +166,12 @@ minimax('r', [Blue, Red], [Blue, NewRed], Move) :-
 
 look_down_two_ply('b', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, UltimateMove, FinalAdv) :-
   generate_next_state('b', Move, [Blue, Red], [TempBlue, TempRed]),
-  ((\+length(TempRed, 0)) -> (land_grab('r', [TempBlue, TempRed], NextBoardState, _),
-  next_generation(NextBoardState, CrankedNextBoardState),
-  land_grab('b', CrankedNextBoardState, FinalBoardState, _),
-  next_generation(FinalBoardState, [FinalBlue, FinalRed])); (FinalBlue = Blue, FinalRed = Red)),
+  ((\+length(TempBlue, 0), \+length(TempRed, 0)) -> (land_grab('r', [TempBlue, TempRed], NextBoardState, _),
+                              next_generation(NextBoardState, [CrankBlue, CrankRed]),
+                              ((\+length(CrankBlue, 0); \+length(CrankRed,0)) -> (land_grab('b', [CrankBlue, CrankRed], FinalBoardState, _),
+                                                          next_generation(FinalBoardState, [FinalBlue, FinalRed]));
+                                                          (FinalBlue = CrankBlue, FinalRed = CrankRed))); 
+                              (FinalBlue = Blue, FinalRed = Red)),
   length(FinalBlue, NumBlue),
   length(FinalRed, NumRed),
   Adv is NumBlue - NumRed,
@@ -178,10 +180,12 @@ look_down_two_ply('b', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, Ultim
 
 look_down_two_ply('r', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, UltimateMove, FinalAdv) :-
   generate_next_state('r', Move, [Blue, Red], [TempBlue, TempRed]),
-  ((\+length(TempBlue, 0)) -> (land_grab('b', [TempBlue, TempRed], NextBoardState, _),
-  next_generation(NextBoardState, CrankedNextBoardState),
-  land_grab('r', CrankedNextBoardState, FinalBoardState, _),
-  next_generation(FinalBoardState, [FinalBlue, FinalRed])); (FinalBlue = Blue, FinalRed = Red)),
+  ((\+length(TempBlue, 0), \+length(TempRed, 0)) -> (land_grab('b', [TempBlue, TempRed], NextBoardState, _),
+                              next_generation(NextBoardState, [CrankBlue, CrankRed]),
+                              ((\+length(CrankBlue, 0); \+length(CrankRed,0)) -> (land_grab('r', [CrankBlue, CrankRed], FinalBoardState, _),
+                                                          next_generation(FinalBoardState, [FinalBlue, FinalRed]));
+                                                          (FinalBlue = CrankBlue, FinalRed = CrankRed))); 
+                              (FinalBlue = Blue, FinalRed = Red)),
   length(FinalBlue, NumBlue),
   length(FinalRed, NumRed),
   Adv is NumRed - NumBlue,
