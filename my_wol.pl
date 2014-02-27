@@ -185,6 +185,7 @@ look_down_two_ply('r', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, Ultim
                               next_generation(NextBoardState, [CrankBlue, CrankRed]),
                               write([CrankBlue, CrankRed]), nl,
                               ((\+length(CrankBlue, 0); \+length(CrankRed,0)) -> (land_grab('r', [CrankBlue, CrankRed], FinalBoardState, _),
+                                                          write(fuck), nl,
                                                           next_generation(FinalBoardState, [FinalBlue, FinalRed]));
                                                           (FinalBlue = CrankBlue, FinalRed = CrankRed))); 
                               (FinalBlue = Blue, FinalRed = Red)),
