@@ -168,6 +168,7 @@ look_down_two_ply('b', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, Ultim
   generate_next_state('b', Move, [Blue, Red], [TempBlue, TempRed]),
   ((\+length(TempBlue, 0), \+length(TempRed, 0)) -> (land_grab('r', [TempBlue, TempRed], NextBoardState, _),
                               next_generation(NextBoardState, [CrankBlue, CrankRed]),
+                              write([CrankBlue, CrankRed]), nl,
                               ((\+length(CrankBlue, 0); \+length(CrankRed,0)) -> (land_grab('b', [CrankBlue, CrankRed], FinalBoardState, _),
                                                           next_generation(FinalBoardState, [FinalBlue, FinalRed]));
                                                           (FinalBlue = CrankBlue, FinalRed = CrankRed))); 
@@ -182,6 +183,7 @@ look_down_two_ply('r', [Move | PossMoves], [Blue, Red], BestMove, MoveAdv, Ultim
   generate_next_state('r', Move, [Blue, Red], [TempBlue, TempRed]),
   ((\+length(TempBlue, 0), \+length(TempRed, 0)) -> (land_grab('b', [TempBlue, TempRed], NextBoardState, _),
                               next_generation(NextBoardState, [CrankBlue, CrankRed]),
+                              write([CrankBlue, CrankRed]), nl,
                               ((\+length(CrankBlue, 0); \+length(CrankRed,0)) -> (land_grab('r', [CrankBlue, CrankRed], FinalBoardState, _),
                                                           next_generation(FinalBoardState, [FinalBlue, FinalRed]));
                                                           (FinalBlue = CrankBlue, FinalRed = CrankRed))); 
